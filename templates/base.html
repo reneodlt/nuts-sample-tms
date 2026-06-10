@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sample TMS — PTM OAuth2</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 820px; margin: 2rem auto; color: #1a1a1a; }
+    nav a { margin-right: 1rem; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
+    .err { color: #b00020; }
+    .ok { color: #0d5d3a; }
+    code { background: #f4f4f4; padding: 0 .3rem; border-radius: 3px; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border-bottom: 1px solid #eee; text-align: left; padding: .4rem .5rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">Status</a>
+    <a href="/tournaments">Tournaments</a>
+    <a href="/tournaments/new">New tournament</a>
+  </nav>
+  <h1>Sample TMS</h1>
+  {% block content %}{% endblock %}
+</body>
+</html>

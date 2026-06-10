@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Create tournament (POST /api/tournaments/ — needs tournament.write)</h2>
+<form method="post" action="/tournaments/new">
+  <input name="name" placeholder="Tournament name" required>
+  <button type="submit">Create</button>
+</form>
+{% if result %}
+<div class="card {{ 'ok' if result.status == 201 else 'err' }}">
+  <p>HTTP {{ result.status }}</p>
+  <pre>{{ result.body }}</pre>
+  {% if result.status == 403 %}<p>403 = your client's token lacks <code>tournament.write</code>.</p>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

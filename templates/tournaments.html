@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Tournaments (GET /api/tournaments/ — needs tournament.read)</h2>
+{% if error %}<div class="card err">{{ error }}</div>{% endif %}
+<table>
+  <tr><th>Name</th><th>Status</th><th>ID</th></tr>
+  {% for t in tournaments %}
+  <tr><td>{{ t.name }}</td><td>{{ t.status }}</td><td><code>{{ t.id }}</code></td></tr>
+  {% else %}
+  <tr><td colspan="3">No tournaments (or read scope missing).</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

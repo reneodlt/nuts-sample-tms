@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Connection</h2>
+  <p>PTM base URL: <code>{{ config.PTM_BASE_URL }}</code></p>
+  <p>Client ID: <code>{{ config.PTM_CLIENT_ID or "(unset — see README)" }}</code></p>
+  <p>Requested scope: <code>{{ config.PTM_SCOPE }}</code></p>
+  <p>Cached token: <code>{{ token.token or "(none)" }}</code>
+     {% if token.token %}— expires in {{ token.expires_in }}s{% endif %}</p>
+</div>
+{% if error %}<div class="card err"><strong>Error:</strong> {{ error }}</div>{% endif %}
+{% if whoami %}
+<div class="card ok">
+  <h2>whoami (token → org → scopes)</h2>
+  <p>Organization: <strong>{{ whoami.organization }}</strong></p>
+  <p>Auth method: <code>{{ whoami.auth_method }}</code></p>
+  <p>Scopes: <code>{{ whoami.scopes | join(", ") }}</code></p>
+</div>
+{% endif %}
+{% endblock %}
