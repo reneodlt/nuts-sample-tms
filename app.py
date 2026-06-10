@@ -33,6 +33,24 @@ DEMO_LEVELS = [
 ]
 
 
+_organization_id_cache = None
+
+
+def _organization_id():
+    """This client's organization_id, resolved once from whoami and cached.
+
+    The tournaments list endpoint isn't filtered to the token's organization
+    server-side yet (see the integration guide, "List-endpoint org scoping"),
+    so the demo scopes the list itself by passing this as an explicit filter.
+    """
+    global _organization_id_cache
+    if _organization_id_cache is None:
+        resp = client.request("GET", "/api/oauth/whoami/")
+        resp.raise_for_status()
+        _organization_id_cache = resp.json().get("organization_id")
+    return _organization_id_cache
+
+
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     whoami, error = None, None
@@ -53,7 +71,16 @@ def home(request: Request):
 def _tournaments_page(request: Request, action_result=None):
     tournaments, error = [], None
     try:
-        resp = client.request("GET", "/api/tournaments/")
+        org_id = _organization_id()
+        if not org_id:
+            raise RuntimeError(
+                "whoami returned no organization_id — this client isn't bound "
+                "to an org; re-provision it (see Troubleshooting in the guide)."
+            )
+        # Scope the list to this client's own venue. Without the filter the
+        # endpoint may return tournaments beyond our organization.
+        resp = client.request("GET", "/api/tournaments/",
+                              params={"organization_id": org_id})
         if resp.status_code == 200:
             data = resp.json()
             tournaments = data.get("results", data) if isinstance(data, dict) else data
@@ -64,6 +91,7 @@ def _tournaments_page(request: Request, action_result=None):
     return templates.TemplateResponse("tournaments.html", {
         "request": request, "tournaments": tournaments, "error": error,
         "action_result": action_result, "actions": LIFECYCLE_ACTIONS,
+        "venue_code": config.PTM_VENUE_CODE,
     })
 
 

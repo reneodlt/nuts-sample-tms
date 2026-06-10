@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Tournaments (GET /api/tournaments/ — needs tournament.read)</h2>
+<p>Scoped to your venue{% if venue_code %} <code>{{ venue_code }}</code>{% endif %}
+   via an <code>organization_id</code> filter.</p>
 {% if error %}<div class="card err">{{ error }}</div>{% endif %}
 {% if action_result %}
 <div class="card {{ 'ok' if action_result.status == 200 else 'err' }}">
