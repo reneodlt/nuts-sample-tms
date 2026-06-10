@@ -1,7 +1,7 @@
 # NUTS Sample TMS — PTM OAuth2 reference client
 
 A minimal Tournament Management System that integrates with
-[Poker Tournament Manager](https://poker.reneo.io) over OAuth2
+[The Networked Ultimate Timing System (NUTS)](https://poker.reneo.io) over OAuth2
 **Client Credentials** (machine-to-machine; no user, no Hanko login). Copy
 `ptm_client.py` as the starting point for a real integration.
 
