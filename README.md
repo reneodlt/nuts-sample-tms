@@ -29,14 +29,26 @@ A minimal Tournament Management System that integrates with
    cp .env.example .env
    # paste client_id / client_secret into .env
    # set PTM_VENUE_CODE to the venue your client is bound to
-   pip install -r requirements.txt
    ```
 
-3. **Run it:**
+3. **Run it** (with [uv](https://docs.astral.sh/uv/) — it creates the venv and
+   installs pinned dependencies from `uv.lock` on first run):
    ```bash
-   ./run.sh
+   ./run.sh            # or: uv run uvicorn app:app --reload --port 8095
    # open http://localhost:8095
    ```
+
+   Run the tests with `uv run pytest`.
+
+   <details>
+   <summary>No uv? Use a plain virtualenv + pip</summary>
+
+   ```bash
+   python -m venv .venv && source .venv/bin/activate
+   pip install -r requirements.txt
+   uvicorn app:app --reload --port 8095
+   ```
+   </details>
 
 ## What to look at
 
