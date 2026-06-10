@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Create tournament (POST /api/tournaments/ — needs tournament.write)</h2>
+<p>Creates at venue <code>{{ config.PTM_VENUE_CODE or "(PTM_VENUE_CODE unset!)" }}</code>
+   with a small demo blind structure, so it can be started right away.</p>
 <form method="post" action="/tournaments/new">
   <input name="name" placeholder="Tournament name" required>
   <button type="submit">Create</button>
@@ -9,7 +11,7 @@
 <div class="card {{ 'ok' if result.status == 201 else 'err' }}">
   <p>HTTP {{ result.status }}</p>
   <pre>{{ result.body }}</pre>
-  {% if result.status == 403 %}<p>403 = your client's token lacks <code>tournament.write</code>.</p>{% endif %}
+  {% if result.status == 403 %}<p>403 = your client's token lacks <code>tournament.write</code> or is bound to a different venue.</p>{% endif %}
 </div>
 {% endif %}
 {% endblock %}

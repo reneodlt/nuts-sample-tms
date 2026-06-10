@@ -28,6 +28,7 @@ A minimal Tournament Management System that integrates with
    ```bash
    cp .env.example .env
    # paste client_id / client_secret into .env
+   # set PTM_VENUE_CODE to the venue your client is bound to
    pip install -r requirements.txt
    ```
 
@@ -41,8 +42,11 @@ A minimal Tournament Management System that integrates with
 
 - **Status page** — fetches a token and calls `/api/oauth/whoami/`, showing the
   resolved organization, auth method, and granted scopes.
-- **Tournaments** — `GET /api/tournaments/` (needs `tournament.read`).
-- **New tournament** — `POST /api/tournaments/` (needs `tournament.write`).
+- **Tournaments** — `GET /api/tournaments/` (needs `tournament.read`), with
+  clock buttons per row: start / pause / resume / advance_level / complete,
+  each a `POST /api/tournaments/{id}/{action}/` (needs `tournament.write`).
+- **New tournament** — `POST /api/tournaments/` with `venue_code` and an inline
+  blind structure (needs `tournament.write`).
 
 ### Seeing scope enforcement
 

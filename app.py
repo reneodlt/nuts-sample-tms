@@ -19,6 +19,19 @@ client = PTMClient(
     config.PTM_BASE_URL, config.PTM_CLIENT_ID, config.PTM_CLIENT_SECRET, config.PTM_SCOPE,
 )
 
+# Clock / lifecycle actions exposed on the tournaments page. Each maps to
+# POST /api/tournaments/{id}/{action}/ and needs tournament.write.
+LIFECYCLE_ACTIONS = ("start", "pause", "resume", "advance_level", "complete")
+
+# A tournament needs a blind structure before it can start. The demo creates
+# a tiny one inline; a real TMS would send its own or use
+# POST /api/tournaments/{id}/levels/generate/ with {"save": true}.
+DEMO_LEVELS = [
+    {"level_number": 1, "small_blind": 25, "big_blind": 50, "ante": 0, "duration_minutes": 15},
+    {"level_number": 2, "small_blind": 50, "big_blind": 100, "ante": 0, "duration_minutes": 15},
+    {"level_number": 3, "small_blind": 100, "big_blind": 200, "ante": 25, "duration_minutes": 15},
+]
+
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
@@ -37,8 +50,7 @@ def home(request: Request):
     })
 
 
-@app.get("/tournaments", response_class=HTMLResponse)
-def tournaments(request: Request):
+def _tournaments_page(request: Request, action_result=None):
     tournaments, error = [], None
     try:
         resp = client.request("GET", "/api/tournaments/")
@@ -51,20 +63,55 @@ def tournaments(request: Request):
         error = str(exc)
     return templates.TemplateResponse("tournaments.html", {
         "request": request, "tournaments": tournaments, "error": error,
+        "action_result": action_result, "actions": LIFECYCLE_ACTIONS,
     })
+
+
+@app.get("/tournaments", response_class=HTMLResponse)
+def tournaments(request: Request):
+    return _tournaments_page(request)
+
+
+@app.post("/tournaments/{tournament_id}/{action}", response_class=HTMLResponse)
+def tournament_action(request: Request, tournament_id: str, action: str):
+    """Drive the tournament clock: start / pause / resume / advance_level / complete."""
+    if action not in LIFECYCLE_ACTIONS:
+        return _tournaments_page(request, {"action": action, "status": 400,
+                                           "body": "unknown action"})
+    try:
+        resp = client.request(
+            "POST", f"/api/tournaments/{tournament_id}/{action}/",
+            json={"reason": f"Sample TMS {action}"},
+        )
+        result = {"action": action, "status": resp.status_code, "body": resp.text}
+    except Exception as exc:
+        result = {"action": action, "status": "error", "body": str(exc)}
+    return _tournaments_page(request, result)
 
 
 @app.get("/tournaments/new", response_class=HTMLResponse)
 def new_tournament_form(request: Request):
-    return templates.TemplateResponse("new_tournament.html", {"request": request, "result": None})
+    return templates.TemplateResponse("new_tournament.html", {
+        "request": request, "result": None, "config": config,
+    })
 
 
 @app.post("/tournaments/new", response_class=HTMLResponse)
 def create_tournament(request: Request, name: str = Form(...)):
-    result = {}
-    try:
-        resp = client.request("POST", "/api/tournaments/", json={"name": name})
-        result = {"status": resp.status_code, "body": resp.text}
-    except Exception as exc:
-        result = {"status": "error", "body": str(exc)}
-    return templates.TemplateResponse("new_tournament.html", {"request": request, "result": result})
+    if not config.PTM_VENUE_CODE:
+        result = {"status": "error",
+                  "body": "PTM_VENUE_CODE is not set — add it to .env (the API "
+                          "requires organization_id or venue_code on create)."}
+    else:
+        try:
+            resp = client.request("POST", "/api/tournaments/", json={
+                "name": name,
+                "venue_code": config.PTM_VENUE_CODE,
+                "levels": DEMO_LEVELS,
+            })
+            result = {"status": resp.status_code, "body": resp.text}
+        except Exception as exc:
+            result = {"status": "error", "body": str(exc)}
+    return templates.TemplateResponse("new_tournament.html", {
+        "request": request, "result": result, "config": config,
+    })

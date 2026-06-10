@@ -9,6 +9,9 @@ class Config:
     PTM_CLIENT_ID = os.getenv("PTM_CLIENT_ID", "")
     PTM_CLIENT_SECRET = os.getenv("PTM_CLIENT_SECRET", "")
     PTM_SCOPE = os.getenv("PTM_SCOPE", "tournament.read tournament.write")
+    # venue_code of the organization this client is bound to — used when
+    # creating tournaments (the API requires organization_id or venue_code).
+    PTM_VENUE_CODE = os.getenv("PTM_VENUE_CODE", "")
     PORT = int(os.getenv("PORT", "8095"))
 
 
