@@ -82,6 +82,9 @@ curl -u "$CLIENT_ID:$CLIENT_SECRET" -d grant_type=client_credentials \
 See the full **[OAuth2 Integration Guide](docs/oauth2_integration_guide.md)**
 (concepts, sequence + architecture diagrams, endpoint reference, troubleshooting).
 
+Onboarding an integration partner? See
+**[Partner onboarding](docs/partner_onboarding.md)** (mint a client → build its `.env`).
+
 ## Files
 
 - `ptm_client.py` — the reusable OAuth2 client (token fetch, cache, re-auth). **Copy this.**
